@@ -7,6 +7,9 @@ const app = express();
 app.use(express.json());
 app.use('/items', itemRoutes);
 
+const cors = require("cors"); 
+
+app.use(cors());
 
 // Default route
 app.get("/", (request, response) => {
