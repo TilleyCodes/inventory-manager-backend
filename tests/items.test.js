@@ -13,6 +13,7 @@ const connectDB = require("../src/utils/database");
 // Importing the code that we want to test
 const app = require("../src/index");
 
+
 beforeAll(async () => {
     await connectDB();
 });
@@ -50,5 +51,46 @@ describe('POST /items', () => {
             quantityInStock: newItem.quantityInStock,
             category: newItem.category
         });
+    });
+});
+
+describe('POST /items - validation', () => {
+    it('should return 400 if "name" is missing', async () => {
+      const badItem = {
+        price: 10,
+        quantityInStock: 5,
+        category: 'Tech'
+      };
+  
+      const res = await request(app)
+        .post('/items')
+        .send(badItem)
+        .expect(400);
+  
+      expect(res.body).toHaveProperty('error');
+      expect(typeof res.body.error).toBe('string');
+    });
+  });
+
+describe('GET /items', () => {
+    it('should return an array of items', async () => {
+      // Arrange: Add a test item first
+      const testItem = {
+        name: 'Test Keyboard',
+        price: 59.99,
+        quantityInStock: 10,
+        category: 'Accessories'
+      };
+  
+      await request(app).post('/items').send(testItem).expect(201);
+  
+      // Act: Make GET request
+      const res = await request(app).get('/items').expect(200);
+  
+      // Assert
+      expect(Array.isArray(res.body)).toBe(true);
+      expect(res.body.length).toBeGreaterThan(0);
+      expect(res.body[0]).toHaveProperty('name');
+      expect(res.body[0]).toHaveProperty('price');
     });
 });
