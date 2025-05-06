@@ -3,7 +3,7 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 
-// mongod://localhost:27017/inventory-manager-backend
+// mongod://localhost:27017/inventory-manager
 const dbName = process.env.npm_package_name;
 const mongoURI = process.env.MONGO_URI || `mongodb://localhost:27017/${dbName}`;
 
