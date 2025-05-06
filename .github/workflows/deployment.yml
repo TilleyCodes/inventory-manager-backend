@@ -1,0 +1,42 @@
+# .github/workflows/deployment.yml
+name: Build and Deploy the NodeJS App
+
+# Only do deployment if a new commit is pushed to 
+# the main or master branches. You could probably just use main,
+# but older repos may still say "master" as their default branch.
+on:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # We can configure the deployment URL to appear on GitHub, on the repository.
+    # This makes it easier for anyone viewing the repository to find the deployed project.
+    # But - the action workflow needs a permission to modify that data in the repository!
+    permissions:
+      deployments: write
+
+    steps:
+      # Load a copy of the repository's latest commit
+      - uses: actions/checkout@v4
+
+      # Install the NodeJS project's dependencies, including dev dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Run any available tests, if the test command is available
+      # - name: Run tests
+      #   run: npm run test --if-present
+
+      # Deploy the NodeJS project
+      - uses: JorgeLNJunior/render-deploy@v1.4.5
+        with:
+          service_id: ${{ secrets.RENDER_SERVICE_ID }}
+          api_key: ${{ secrets.RENDER_API_KEY }}
+          clear_cache: true # Optional: Clear Render's build cache
+          wait_deploy: true
+          github_deployment: true
+          deployment_environment: 'production'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
